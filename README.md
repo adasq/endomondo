@@ -3,8 +3,8 @@
 Endomondo API for nodejs.
 
 ## Get started
-```js
-$ npm i -s endomondo
+```sh
+$ npm install -S endomondo
 ```
 
 ```js
@@ -30,8 +30,11 @@ const endoSession = endo.authenticate({
 
 });
 ```
+## API usage
+When session is established properly, you can use data edpoints.
 
-## News feed
+
+### News feed
 ```js
 endoSession.feed((err, feed) => {
     if(err) return console.log(err);
@@ -39,10 +42,16 @@ endoSession.feed((err, feed) => {
 });
 ```
 
-## Friends list
+### Friends list
 ```js
 endoSession.friends((err, friends) => {
     if(err) return console.log(err);
     console.log(friends); // friends list
 });
+```
+
+## Test
+
+```sh
+$ npm test
 ```
