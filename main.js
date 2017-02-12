@@ -1,18 +1,34 @@
 const request = require('request').defaults({jar: true});
+const pages = require('./src/pages/pages.js');
 
 const BASE_URL = 'www.endomondo.com';
 const HOME_URL = 'https://www.endomondo.com/home';
 const LOGIN_URL = 'https://www.endomondo.com/rest/session';
 const FEED_URL = 'https://www.endomondo.com/rest/v1/feeds/subscriptions?limit=20'
+const FRIENDS_URL = 'https://www.endomondo.com/people/friends/';
 
 function getCookieEntry(j, key){
     return j._jar.store.idx[BASE_URL]['/'][key].value
 }
 
+function friends(sessionRef, cb) {
+    request({
+        url: FRIENDS_URL,
+        jar: sessionRef._cookie,
+        headers: {
+            'x-csrf-token': sessionRef.csrfToken
+        }
+    }, (err, response, body) => {
+        if(err) return cb(err);
+        const friendsList = pages.friends.getFriendsList(body);
+        if(!friendsList) return cb(new Error('Problem while parsing friends page'));
+        cb(null, friendsList);
+    });    
+}
+
 function feed(sessionRef, cb){
     request({
         url: FEED_URL,
-        method: 'GET',
         json: true,
         jar: sessionRef._cookie,
         headers: {
@@ -30,6 +46,7 @@ function authenticate({email, password}, cb){
 
     const sessionRef = {
         feed: (cb) => feed(sessionRef, cb),
+        friends: (cb) => friends(sessionRef, cb),
         _cookie: cookie,
         authenticated: false,
         csrfToken: null
